@@ -118,3 +118,19 @@ export async function updateUser(id: number, username?: string, password?: strin
         throw e;
     }
 }
+ export async function getPendingReimbursements(): Promise<Reimbursement[]>
+ {
+     try
+     {
+         const response = await backendClient.get("/reimbursements/status/1")
+         return response.data.map((reimObj: any)=>{
+            const {id, author, amount, dateSubmitted, dateResolved, description, resolver, status, type } = reimObj;
+            return new Reimbursement(id, author, amount, dateSubmitted, dateResolved, description, resolver, status, type)
+        })
+     }
+     catch(e)
+     {
+         throw e;
+     }
+
+ }

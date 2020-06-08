@@ -1,8 +1,9 @@
 import React from 'react';
 import {Reimbursement} from "../models/Reimbursements";
-import { Form, FormGroup, Label, Input, Button } from 'reactstrap';
+import { Form, FormGroup, Label, Input, Button, Container, Row, Col, Spinner } from 'reactstrap';
 import { toast } from 'react-toastify';
-import { updateReimbursement } from '../api/backend-client';
+import { updateReimbursement, getPendingReimbursements } from '../api/backend-client';
+import { ObjectTable } from './objectTable';
 
 interface IUpdateReimComponentState
 {
@@ -14,7 +15,9 @@ interface IUpdateReimComponentState
     description: string | undefined, 
     resolver: number | undefined, 
     status: number | undefined, 
-    type: number | undefined
+    type: number | undefined,
+    reimbursements: Reimbursement[],
+    reimsLoaded: boolean
 
 }
 
@@ -33,7 +36,23 @@ export class UpdateReimComponent extends React.Component<any,IUpdateReimComponen
             description: undefined, 
             resolver: undefined, 
             status: undefined, 
-            type: undefined
+            type: undefined, 
+            reimbursements: [],
+            reimsLoaded: false
+        }
+    }
+    async componentDidMount()
+    {
+        try
+        {
+            this.setState({
+                reimbursements: await getPendingReimbursements(),
+                reimsLoaded: true
+            })
+        }
+        catch(e)
+        {
+            throw e;
         }
     }
 
@@ -73,7 +92,19 @@ export class UpdateReimComponent extends React.Component<any,IUpdateReimComponen
     {
         return(
             <div>
-                <Form onSubmit={this.updateReim}>
+                <Container>
+                        <Row>
+                        <Col md={{ size: 5 }}>
+                            <h4>Pending Reimbursements</h4>
+                            {this.state.reimsLoaded ? (
+                            <ObjectTable objects={this.state.reimbursements} />
+                            ) : (
+                            <Spinner />
+                            )}
+                        </Col>
+                        </Row>
+                </Container>
+                <Form md={{size: 6}} onSubmit={this.updateReim}>
                     <FormGroup>
                         <Label for="id">ID for Reimbursement</Label>
                         <Input
@@ -85,66 +116,6 @@ export class UpdateReimComponent extends React.Component<any,IUpdateReimComponen
                         />
                     </FormGroup>
                     <FormGroup>
-                        <Label for="author">Author: Using UserID</Label>
-                        <Input
-                            onChange={this.bindInputChangeTostate}
-                            value={this.state.author}
-                            type="number"
-                            name="author"
-                            id="author"
-                        />
-                    </FormGroup>
-                    <FormGroup>
-                        <Label for="amount">Amount in USD</Label>
-                        <Input
-                            onChange={this.bindInputChangeTostate}
-                            value={this.state.amount}
-                            type="number"
-                            name="amount"
-                            id="amount"
-                        />
-                    </FormGroup>
-                    <FormGroup>
-                        <Label for="dateSubmitted">Date Submitted</Label>
-                        <Input
-                            onChange={this.bindInputChangeTostate}
-                            value={this.state.dateSubmitted}
-                            type="number"
-                            name="dateSubmitted"
-                            id="dateSubmitted"
-                        />
-                    </FormGroup>
-                    <FormGroup>
-                        <Label for="dateResolved">Date Resolved</Label>
-                        <Input
-                            onChange={this.bindInputChangeTostate}
-                            value={this.state.dateResolved}
-                            type="number"
-                            name="dateResolved"
-                            id="dateResolved"
-                        />
-                    </FormGroup>
-                    <FormGroup>
-                        <Label for="description">Description</Label>
-                        <Input
-                            onChange={this.bindInputChangeTostate}
-                            value={this.state.description}
-                            type="text"
-                            name="description"
-                            id="description"
-                        />
-                    </FormGroup>
-                    <FormGroup>
-                        <Label for="resolver">Resolving Manager: UserID</Label>
-                        <Input
-                            onChange={this.bindInputChangeTostate}
-                            value={this.state.resolver}
-                            type="number"
-                            name="resolver"
-                            id="resolver"
-                        />
-                    </FormGroup>
-                    <FormGroup>
                         <Label for="status">Status: 2-Approved 3-Denied</Label>
                         <Input
                             onChange={this.bindInputChangeTostate}
@@ -152,16 +123,6 @@ export class UpdateReimComponent extends React.Component<any,IUpdateReimComponen
                             type="number"
                             name="status"
                             id="status"
-                        />
-                    </FormGroup>
-                    <FormGroup>
-                        <Label for="type">Type</Label>
-                        <Input
-                            onChange={this.bindInputChangeTostate}
-                            value={this.state.type}
-                            type="number"
-                            name="type"
-                            id="type"
                         />
                     </FormGroup>
                     <Button>Update</Button>

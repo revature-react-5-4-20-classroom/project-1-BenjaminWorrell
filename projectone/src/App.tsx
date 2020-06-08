@@ -71,7 +71,7 @@ export default class App extends React.Component<any, any>{
               <ReimbursementDisplay loggedInUser={this.state.loggedInUser}/>
             </Route>
             <Route path="/submit">
-              <ReimForm/>
+              <ReimForm loggedInUser={this.state.loggedInUser}/>
             </Route>
             <Route path="/main">
               <HomePage loggedInUser={this.state.loggedInUser}/>

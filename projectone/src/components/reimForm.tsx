@@ -3,6 +3,7 @@ import {Reimbursement} from "../models/Reimbursements";
 import { Form, FormGroup, Label, Input, Button } from 'reactstrap';
 import { toast } from 'react-toastify';
 import {submitReimbursement} from "../api/backend-client"
+import { User } from '../models/User';
 
 
 
@@ -15,6 +16,12 @@ interface IReimFormState{
     resolver: number, 
     status: number, 
     type: number
+
+}
+
+interface IReimFormProps
+{
+    loggedInUser: User;
 }
 
 export class ReimForm extends React.Component<any, IReimFormState>
@@ -39,7 +46,7 @@ export class ReimForm extends React.Component<any, IReimFormState>
         submitEvent.preventDefault();
         try
         {
-            const reim = new Reimbursement(0, this.state.author, this.state.amount, this.state.dateSubmitted, this.state.dateResolved, this.state.description, this.state.resolver, this.state.status, this.state.type);
+            const reim = new Reimbursement(0, this.props.loggedInUser.id, this.state.amount, this.state.dateSubmitted, this.state.dateResolved, this.state.description, 2, 1, this.state.type);
             await submitReimbursement(reim);
             toast(`New reimbursement request added successfully!`, {type: "success"});
             this.clearForm();
@@ -74,17 +81,6 @@ export class ReimForm extends React.Component<any, IReimFormState>
     {
         return(
             <Form onSubmit={this.submitReim}>
-                <FormGroup>
-                    <Label for="author">Author: Using UserID</Label>
-                    <Input
-                        onChange={this.bindInputChangeTostate}
-                        value={this.state.author}
-                        type="number"
-                        name="author"
-                        id="author"
-                        required
-                    />
-                </FormGroup>
                 <FormGroup>
                     <Label for="amount">Amount in USD</Label>
                     <Input
@@ -130,29 +126,7 @@ export class ReimForm extends React.Component<any, IReimFormState>
                     />
                 </FormGroup>
                 <FormGroup>
-                    <Label for="resolver">Resolving Manager: UserID</Label>
-                    <Input
-                        onChange={this.bindInputChangeTostate}
-                        value={this.state.resolver}
-                        type="number"
-                        name="resolver"
-                        id="resolver"
-                        required
-                    />
-                </FormGroup>
-                <FormGroup>
-                    <Label for="status">Status: Please enter 1</Label>
-                    <Input
-                        onChange={this.bindInputChangeTostate}
-                        value={this.state.status}
-                        type="number"
-                        name="status"
-                        id="status"
-                        required
-                    />
-                </FormGroup>
-                <FormGroup>
-                    <Label for="type">Type</Label>
+                    <Label for="type">Type 1-Lodging 2-Travel 3-Food</Label>
                     <Input
                         onChange={this.bindInputChangeTostate}
                         value={this.state.type}
